@@ -1,0 +1,8 @@
+.idea/
+
+funi-demo-*/*.iml
+
+funi-demo-*/target/
+*.pdb
+*.iml
+*.log
