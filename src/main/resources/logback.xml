@@ -12,6 +12,11 @@
         <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件。-->
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <FileNamePattern>${log.base}/logs/err.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--每天生成一个日志文件，保存30天的日志文件。-->
+            <maxHistory>30</maxHistory>
+            <!--按照固定窗口模式生成日志文件，当文件大于10MB时，生成新的日志文件。窗口大小是1到3，当保存了3个归档文件后，将覆盖最早的日志。-->
+            <minIndex>1</minIndex>
+            <maxIndex>3</maxIndex>
         </rollingPolicy>
         <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
             <MaxFileSize>${log.max.size}</MaxFileSize>
@@ -20,11 +25,12 @@
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread]%logger{56}.%method:%L -%msg%n</pattern>
         </layout>
-        <!-- 设置日志不超过${log.max.size}时的保存路径，注意如果 是web项目会保存到Tomcat的bin目录 下 -->
+        <!--  过滤器，执行一个过滤器会有返回个枚举值，即DENY，NEUTRAL，ACCEPT其中之一。返回DENY，日志将立即被抛弃不再经过其他过滤器；返回NEUTRAL，有序列表里的下个过滤器过接着处理日志；返回ACCEPT，日志会被立即处理，不再经过剩余过滤器。
+过滤器被添加到<Appender> 中，为<Appender> 添加一个或多个过滤器后，可以用任意条件对日志进行过滤。<Appender> 有多个过滤器时，按照配置顺序执行。 -->
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
+            <onMatch>ACCEPT</onMatch><!--用于配置符合过滤条件的操作-->
+            <onMismatch>DENY</onMismatch><!--用于配置不符合过滤条件的操作-->
         </filter>
     </appender>
     <!-- 时间滚动输出 level为 DEBUG 日志 -->
@@ -50,6 +56,7 @@
     </appender>
     <!-- 为某个包下的所有类的指定Appender 这里也可以指定类名称例如：com.aa.bb.ClassName -->
     <logger name="org.apache.commons.httpclient">
+        <!--用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF-->
         <level value="INFO"/>
     </logger>
     <logger name="httpclient">
@@ -59,13 +66,13 @@
         <level value="INFO"/>
     </logger>
     <logger name="com.funi.demo">
-        <level value="INFO"/>
+        <!--level 使用 root level-->
+        <appender-ref ref="file—error"/>
     </logger>
 
     <!-- root将级别为“DEBUG”及大于“DEBUG”的日志信息交给已经配置好的名为“Console”的appender处理，“Console”appender将信息打印到Console -->
     <root level="${log.root.level}">
         <appender-ref ref="stdout"/>
-        <appender-ref ref="file—error"/>
         <appender-ref ref="file—all"/>
     </root>
 
